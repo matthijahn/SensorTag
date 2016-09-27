@@ -13,8 +13,11 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        sensortag.cpp
+        sensortag.cpp \
+    scanner.cpp
 
-HEADERS  += sensortag.h
+HEADERS  += sensortag.h \
+    scanner.h
 
-FORMS    += sensortag.ui
+FORMS    += sensortag.ui \
+    scanner.ui
