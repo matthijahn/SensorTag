@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 
+#include "scanner.h"
+
+
 namespace Ui {
 class sensortag;
 }
@@ -17,6 +20,11 @@ public:
 
 private:
     Ui::sensortag *ui;
+    scanner *m_scanwindow;
+
+private slots:
+    void openScanWindow();
+
 };
 
 #endif // SENSORTAG_H

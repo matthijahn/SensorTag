@@ -25,14 +25,14 @@
     <item row="1" column="1">
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QPushButton" name="btn_2">
+       <widget class="QPushButton" name="btn_1">
         <property name="text">
          <string>Add Device</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_4">
+       <widget class="QPushButton" name="btn_2">
         <property name="text">
          <string>Add Device</string>
         </property>
@@ -46,7 +46,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_1">
+       <widget class="QPushButton" name="btn_4">
         <property name="text">
          <string>Add Device</string>
         </property>
@@ -64,16 +64,16 @@
     <item row="1" column="0">
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QLineEdit" name="le_2"/>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="le_4"/>
-      </item>
-      <item>
        <widget class="QLineEdit" name="le_1"/>
       </item>
       <item>
+       <widget class="QLineEdit" name="le_2"/>
+      </item>
+      <item>
        <widget class="QLineEdit" name="le_3"/>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="le_4"/>
       </item>
       <item>
        <widget class="QLineEdit" name="le_5"/>
