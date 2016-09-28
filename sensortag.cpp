@@ -1,7 +1,6 @@
 #include "sensortag.h"
 #include "ui_sensortag.h"
 
-#include "scanner.h"
 
 sensortag::sensortag(QWidget *parent) :
     QMainWindow(parent),
@@ -21,3 +20,4 @@ void sensortag::openScanWindow()
    m_scanwindow = new scanner();
    m_scanwindow->show();
 }
+

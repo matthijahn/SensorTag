@@ -3,6 +3,9 @@
 
 #include <QWidget>
 
+#include <QBluetoothDeviceDiscoveryAgent>
+#include <QBluetoothDeviceInfo>
+
 namespace Ui {
 class scanner;
 }
@@ -17,6 +20,11 @@ public:
 
 private:
     Ui::scanner *ui;
+
+
+private slots:
+    void deviceDiscover();
+    void showDevices(const QBluetoothDeviceInfo&);
 };
 
 #endif // SCANNER_H
