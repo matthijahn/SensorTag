@@ -24,12 +24,16 @@ public:
 private:
     Ui::scanner *ui;
     QMap<QString, QBluetoothAddress> m_address_map;
+    QLowEnergyController *m_control;
 
 
 private slots:
-    void deviceDiscover();
+    void deviceDiscover(void);
     void showDevices(const QBluetoothDeviceInfo&);
     void controlDevice(QListWidgetItem*);
+    void scanService(void);
+    void status(void);
+    void serviceStatus(const QBluetoothUuid ble_id);
 };
 
 #endif // SCANNER_H
