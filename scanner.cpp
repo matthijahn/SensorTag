@@ -32,6 +32,7 @@ void scanner::showDevices(const QBluetoothDeviceInfo &device)
 {
     ui->lst_devices->clear();
     m_address_map.clear();
+    m_service_map.clear();
     if(device.coreConfigurations() & QBluetoothDeviceInfo::LowEnergyCoreConfiguration)
     {
         m_address_map[device.address().toString()] = device.address();
@@ -57,7 +58,34 @@ void scanner::controlDevice(QListWidgetItem* address)
 void scanner::scanService(void)
 {
     connect(m_control, SIGNAL(serviceDiscovered(QBluetoothUuid)),this,SLOT(serviceStatus(QBluetoothUuid)));
+    connect(m_control, SIGNAL(discoveryFinished()),this,SLOT(readService()));
     m_control->discoverServices();
+}
+
+void scanner::readService(void)
+{
+    //QBluetoothUuid acc_sensor;
+    //acc_sensor.QBluetoothUuid(ACC_UUID);
+    //acc_sensor.QBluetoothUuid(ACC_UUID);
+    m_service = m_control->createServiceObject(m_service_map[ACC_UUID]);
+
+    connect(m_service,SIGNAL(stateChanged(QLowEnergyService::ServiceState)),this,SLOT(readCharacteristic()));
+
+    m_service->discoverDetails();
+    qInfo() << "Service Object created";
+
+    //qInfo() << service->characteristics();
+
+}
+
+void scanner::readCharacteristic(void)
+{
+    //qInfo() << char_id.name();
+    //qInfo() << char_value;
+    qInfo() << "State Changed";
+    QList<QLowEnergyCharacteristic> foo = m_service->characteristics();
+
+    //qInfo() << m_service->characteristics()[1].value();
 }
 
 void scanner::status(void)
@@ -68,4 +96,5 @@ void scanner::status(void)
 void scanner::serviceStatus(const QBluetoothUuid ble_id)
 {
     qInfo() << ble_id;
+    m_service_map[ble_id.toString()] = ble_id;
 }
