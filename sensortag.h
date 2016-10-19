@@ -5,21 +5,20 @@
 
 #include "scanner.h"
 
-
 namespace Ui {
-class sensortag;
+class SensorTag;
 }
 
-class sensortag : public QMainWindow
+class SensorTag : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit sensortag(QWidget *parent = 0);
-    ~sensortag();
+    explicit SensorTag(QWidget *parent = 0);
+    ~SensorTag();
 
 private:
-    Ui::sensortag *ui;
+    Ui::SensorTag *ui;
     scanner *m_scanwindow;
 
 private slots:

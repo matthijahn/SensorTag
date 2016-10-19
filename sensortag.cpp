@@ -1,23 +1,21 @@
 #include "sensortag.h"
 #include "ui_sensortag.h"
 
-
-sensortag::sensortag(QWidget *parent) :
+SensorTag::SensorTag(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::sensortag)
+    ui(new Ui::SensorTag)
 {
     ui->setupUi(this);
     connect(ui->btn_1,SIGNAL(clicked()),this,SLOT(openScanWindow()));
 }
 
-sensortag::~sensortag()
+SensorTag::~SensorTag()
 {
     delete ui;
 }
 
-void sensortag::openScanWindow()
+void SensorTag::openScanWindow()
 {
    m_scanwindow = new scanner();
    m_scanwindow->show();
 }
-

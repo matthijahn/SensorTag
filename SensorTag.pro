@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2016-09-27T09:57:05
+# Project created by QtCreator 2016-10-19T13:24:37
 #
 #-------------------------------------------------
 
@@ -8,7 +8,7 @@ QT       += core gui bluetooth
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = SensorTagv2
+TARGET = SensorTag
 TEMPLATE = app
 
 
