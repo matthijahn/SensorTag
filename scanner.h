@@ -3,19 +3,27 @@
 
 #include <QWidget>
 #include <QMap>
+#include <QList>
 #include <QListWidgetItem>
 
 
 #include <QBluetoothDeviceDiscoveryAgent>
 #include <QBluetoothDeviceInfo>
-#include <QLowEnergyController>
-#include <QLowEnergyService>
-#include <QBluetoothUuid>
+//#include <QLowEnergyController>
+//#include <QLowEnergyService>
+//#include <QBluetoothUuid>
+//#include <QLowEnergyCharacteristic>
 
 #include <QDebug>
+typedef struct
+{
+    QString Address;
+    int Acc_SRate;
+    int Acc_Res;
+    int Gyro_SRate;
+} settings_t;
 
-#define ACC_UUID "{f000aa10-0451-4000-b000-000000000000}"
-#define GYRO_UUID "{f000aa50-0451-4000-b000-000000000000}"
+
 
 namespace Ui {
 class scanner;
@@ -28,24 +36,27 @@ class scanner : public QWidget
 public:
     explicit scanner(QWidget *parent = 0);
     ~scanner();
+    settings_t p_DeviceSettings;
+
+signals:
+    void ConfigChanged();
+    void ConfigStays();
 
 private:
     Ui::scanner *ui;
-    QMap<QString, QBluetoothAddress> m_address_map;
-    QLowEnergyController *m_control;
-    QMap<QString, QBluetoothUuid> m_service_map;
-    QLowEnergyService *m_service;
+    QBluetoothDeviceDiscoveryAgent *m_DiscoveryAgent;
+
 
 
 private slots:
-    void deviceDiscover(void);
-    void showDevices(const QBluetoothDeviceInfo&);
-    void controlDevice(QListWidgetItem*);
-    void scanService(void);
-    void status(void);
-    void serviceStatus(const QBluetoothUuid ble_id);
-    void readService(void);
-    void readCharacteristic(void);
+    void DeviceDiscover(void);
+    void DeviceDiscoverFinished(void);
+    void DeviceDiscovered(QBluetoothDeviceInfo DeviceInfo);
+    void SetSettings();
+    void HoldConfig();
+
+
+
 };
 
 #endif // SCANNER_H

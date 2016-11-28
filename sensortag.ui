@@ -15,65 +15,61 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="2" column="1">
+    <item row="3" column="1">
      <widget class="QPushButton" name="btn_start">
       <property name="text">
        <string>Start Aquasition</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QPushButton" name="btn_1">
-        <property name="text">
-         <string>Add Device</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_2">
-        <property name="text">
-         <string>Add Device</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_3">
-        <property name="text">
-         <string>Add Device</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_4">
-        <property name="text">
-         <string>Add Device</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_5">
-        <property name="text">
-         <string>Add Device</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
     <item row="1" column="0">
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Body</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLineEdit" name="le_1"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Left Arm</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLineEdit" name="le_2"/>
       </item>
       <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Right Arm</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLineEdit" name="le_3"/>
       </item>
       <item>
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Left Leg</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLineEdit" name="le_4"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Right Leg</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLineEdit" name="le_5"/>
@@ -83,10 +79,78 @@
     <item row="0" column="0">
      <widget class="QLineEdit" name="le_out_fname"/>
     </item>
+    <item row="1" column="1">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QPushButton" name="btn_add_body">
+        <property name="text">
+         <string>Add Device</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_add_la">
+        <property name="text">
+         <string>Add Device</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_add_ra">
+        <property name="text">
+         <string>Add Device</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_add_ll">
+        <property name="text">
+         <string>Add Device</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_add_rl">
+        <property name="text">
+         <string>Add Device</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
     <item row="0" column="1">
      <widget class="QPushButton" name="btn_sel_out_fname">
       <property name="text">
        <string>Save As</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLineEdit" name="le_acc_x"/>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="le_acc_y"/>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="le_acc_z"/>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="le_gyro_x"/>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="le_gyro_y"/>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="le_gyro_z"/>
+      </item>
+     </layout>
+    </item>
+    <item row="4" column="1">
+     <widget class="QPushButton" name="btn_stop">
+      <property name="text">
+       <string>Stop Aquasition</string>
       </property>
      </widget>
     </item>
