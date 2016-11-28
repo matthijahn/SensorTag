@@ -11,6 +11,7 @@ SensorTag::SensorTag(QWidget *parent) :
     connect(ui->btn_add_body,SIGNAL(clicked()),this,SLOT(OpenBodyCfg()));
     connect(ui->btn_start,SIGNAL(clicked(bool)),this,SLOT(ConnectToDevices()));
     connect(ui->btn_stop,SIGNAL(clicked(bool)),this,SLOT(StopAquasition()));
+    connect(ui->btn_sel_out_fname,SIGNAL(clicked(bool)),this,SLOT(OpenOutFile()));
 }
 
 SensorTag::~SensorTag()
@@ -119,7 +120,36 @@ void SensorTag::ConnectToDevices()
         m_Controllers.append(new QLowEnergyController(QBluetoothAddress(ui->le_5->text())));
     }
 
+    m_OutFile = new QFile(m_OutputFileName);
+    if (!m_OutFile->open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
 
+    m_OutStream.setDevice(m_OutFile);
+
+    for(int i = 0; i < m_Controllers.length(); i++)
+    {
+        switch (i)
+        {
+        case BODY:
+            m_OutStream << "Body ACC X, Body ACC Y, Body ACC Z, Body Gyro Z, Body Gyro Y, Body Gyro Z";
+            break;
+        case LEFT_ARM:
+            m_OutStream << ", LA ACC X, LA ACC Y, LA ACC Z, LA Gyro Z, LA Gyro Y, LA Gyro Z";
+            break;
+        case RIGHT_ARM:
+            m_OutStream << ", RA ACC X, RA ACC Y, RA ACC Z, RA Gyro Z, RA Gyro Y, RA Gyro Z";
+            break;
+        case LEFT_LEG:
+            m_OutStream << ", LL ACC X, LL ACC Y, LL ACC Z, LL Gyro Z, LL Gyro Y, LL Gyro Z";
+            break;
+        case RIGHT_LEG:
+            m_OutStream << ", RL ACC X, RL ACC Y, RL ACC Z, RL Gyro Z, RL Gyro Y, RL Gyro Z";
+        default:
+            break;
+        }
+    }
+    m_OutStream << "\n";
+    m_OutStream.flush();
 
     foreach(QLowEnergyController *Controller, m_Controllers)
     {
@@ -224,6 +254,19 @@ void SensorTag::ConfigServices()
         }
     }
     ui->statusBar->showMessage("Config Services");
+    foreach (QLowEnergyService *Service, m_GyroServices)
+    {
+        // Period Characteristic is not set ???
+        // A SensorTag Firmwreupdate to 1.5 schould fix the Problem
+        QBluetoothUuid bar = QBluetoothUuid(QString(GYRO_PERIOD_REG));
+        QLowEnergyCharacteristic foo = Service->characteristic(bar);
+
+        m_GyroPeriodChars.append(Service->characteristic((QBluetoothUuid(QString(GYRO_PERIOD_REG)))));
+
+        m_GyroConfigChars.append(Service->characteristic((QBluetoothUuid(QString(GYRO_CONFIG_REG)))));
+
+        m_GyroDataChars.append(Service->characteristic((QBluetoothUuid(QString(GYRO_DATA_REG)))));
+    }
     foreach (QLowEnergyService *Service, m_AccServices)
     {
         m_AccConfigChars.append(Service->characteristic((QBluetoothUuid(QString(ACC_CONFIG_REG)))));
@@ -232,38 +275,44 @@ void SensorTag::ConfigServices()
 
 
     }
-    foreach (QLowEnergyService *Service, m_GyroServices)
+
+
+    foreach (QLowEnergyCharacteristic Char, m_AccDataChars)
     {
-        m_GyroConfigChars.append(Service->characteristic((QBluetoothUuid(QString(GYRO_CONFIG_REG)))));
-        m_GyroPeriodChars.append(Service->characteristic((QBluetoothUuid(QString(GYRO_PERIOD_REG)))));
-        m_GyroDataChars.append(Service->characteristic((QBluetoothUuid(QString(GYRO_DATA_REG)))));
+        m_AccNotificationDesc.append(Char.descriptor(QBluetoothUuid::ClientCharacteristicConfiguration));
+    }
+
+    foreach (QLowEnergyCharacteristic Char, m_GyroDataChars)
+    {
+        m_GyroNotificationDesc.append(Char.descriptor(QBluetoothUuid::ClientCharacteristicConfiguration));
     }
 
     // Here Be Dragons
+    // TODO Dynamicly add Values for Config
+
+
 
     for (int i = 0; i < m_AccServices.length(); i++)
     {
         m_AccServices[i]->writeCharacteristic(m_AccConfigChars[i],QByteArray::fromHex("1"));
         m_AccServices[i]->writeCharacteristic(m_AccPeriodChars[i],QByteArray::fromHex("A"));
+        m_AccServices[i]->writeDescriptor(m_AccNotificationDesc[i],QByteArray::fromHex("0100"));
 
     }
-//    foreach (QLowEnergyService *Service, m_AccServices)
-//    {
-//        foreach (QLowEnergyCharacteristic Char, m_AccConfigChars)
-//        {
-//            Service->writeCharacteristic(Char, QByteArray::fromHex("1"));
-//        }
-//        foreach (QLowEnergyCharacteristic Char, m_AccPeriodChars)
-//        {
-//            Service->writeCharacteristic(Char,QByteArray::fromHex("A"));
-//        }
+    for (int i = 0; i < m_GyroServices.length(); i++)
+    {
+        m_GyroServices[i]->writeCharacteristic(m_GyroConfigChars[i],QByteArray::fromHex("7"));
+        m_GyroServices[i]->writeCharacteristic(m_GyroPeriodChars[i],QByteArray::fromHex("A"));
+        m_GyroServices[i]->writeDescriptor(m_GyroNotificationDesc[i],QByteArray::fromHex("0100"));
 
-        //m_AccService->writeCharacteristic(m_AccConfigChar,QByteArray::fromHex("1"));
-        //m_AccService->writeCharacteristic(m_AccPeriodChar,QByteArray::fromHex("A"));
-    //}
-    m_NotificationDesc = m_AccDataChars[0].descriptor(QBluetoothUuid::ClientCharacteristicConfiguration);
-    m_AccServices[0]->writeDescriptor(m_NotificationDesc,QByteArray::fromHex("0100"));
-    connect(m_AccServices.at(0),SIGNAL(characteristicChanged(QLowEnergyCharacteristic,QByteArray)),this,SLOT(showData(QLowEnergyCharacteristic,QByteArray)));
+    }
+
+    foreach (QLowEnergyService *Service, m_AccServices) {
+       connect(Service,SIGNAL(characteristicChanged(QLowEnergyCharacteristic,QByteArray)),this,SLOT(aquireData(QLowEnergyCharacteristic,QByteArray)));
+    }
+    foreach (QLowEnergyService *Service, m_GyroServices) {
+       connect(Service,SIGNAL(characteristicChanged(QLowEnergyCharacteristic,QByteArray)),this,SLOT(aquireData(QLowEnergyCharacteristic,QByteArray)));
+    }
 }
 
 
@@ -301,22 +350,46 @@ void SensorTag::ConfigDevice(QLowEnergyService::ServiceState BleServiceState)
 
 void SensorTag::readAccData(QLowEnergyDescriptor desc, QByteArray value)
 {
+
     //m_AccService->readDescriptor(desc);
     qInfo() << desc.value();
 }
 
-void SensorTag::showData(QLowEnergyCharacteristic Char, QByteArray value)
+void SensorTag::aquireData(QLowEnergyCharacteristic Char, QByteArray value)
 {
-    if(Char == m_AccDataChars.at(0))
+    //m_DataMap.insert(Char, value);
+    if(m_AccDataChars.contains(Char))
     {
-        ui->le_acc_x->setText(QString::number(value.at(0)));
-        ui->le_acc_y->setText(QString::number(value.at(1)));
-        ui->le_acc_z->setText(QString::number(value.at(2)));
+         m_AccDataMap.insert(m_AccDataChars.indexOf(Char),value);
+        qInfo() << "Acc";
+
+    }
+    if(m_GyroDataChars.contains(Char))
+    {
+        m_GyroDataMap.insert(m_AccDataChars.indexOf(Char),value);
+        qInfo() << "Gyro";
+    }
+    if(m_GyroDataMap.size() == m_GyroDataChars.length() && m_AccDataMap.size() == m_AccDataChars.length())
+    {
+        ShowData();
+    }
+//    if(Char == m_AccDataChars.at(0))
+//    {
+//        for(int i = 0; i < m_AccServices.length(); i++)
+//        {
+
+//            m_AccServices[i]->readCharacteristic(m_AccDataChars[i]);
+//            m_GyroServices[i]->readCharacteristic(m_GyroDataChars[i]);
+
+//        }
+//        ui->le_acc_x->setText(QString::number(value.at(0)));
+//        ui->le_acc_y->setText(QString::number(value.at(1)));
+//        ui->le_acc_z->setText(QString::number(value.at(2)));
 //       int x = value.at(0);
 //       int y = value.at(1);
 //       int z = value.at(2);
 //       qInfo() << x << y << z;
-    }
+//    }
 //    if(Char == m_GyroDataChar)
 //    {
 //        ui->le_gyro_x->setText(QString::number(value.at(0)));
@@ -325,6 +398,31 @@ void SensorTag::showData(QLowEnergyCharacteristic Char, QByteArray value)
 //    }
     ui->statusBar->showMessage("Aquarring");
 
+}
+
+void SensorTag::ShowData()
+{
+    for(int i = 0; i < m_AccDataMap.size(); i++)
+    {
+        QByteArray Acc = m_AccDataMap.value(i);
+        QByteArray Gyro = m_GyroDataMap.value(i);
+        if(i!=0)
+        {
+            m_OutStream << ",";
+        }
+        m_OutStream << int8_t(Acc[0]) << "," << int8_t(Acc[1]) << "," << int8_t(Acc[2]) << ",";
+        m_OutStream << int16_t(Gyro[1] << 8 & Gyro[0]) << "," <<  int16_t(Gyro[3] << 8 & Gyro[2]) << "," << int16_t(Gyro[5] << 8 & Gyro[4]);
+    }
+    m_OutStream << "\n";
+
+//    foreach (QByteArray value, m_AccDataMap) {
+//       qInfo() << value;
+//    }
+//    foreach (QByteArray value, m_GyroDataMap) {
+//       qInfo() << value;
+//    }
+    m_AccDataMap.clear();
+    m_GyroDataMap.clear();
 }
 
 void SensorTag::UpdateConfig()
@@ -341,7 +439,8 @@ void SensorTag::NoChangedConfig()
 
 void SensorTag::StopAquasition()
 {
-    disconnect(m_AccServices.at(0),SIGNAL(characteristicChanged(QLowEnergyCharacteristic,QByteArray)),this,SLOT(showData(QLowEnergyCharacteristic,QByteArray)));
+    m_OutStream.flush();
+    //disconnect(m_AccServices.at(0),SIGNAL(characteristicChanged(QLowEnergyCharacteristic,QByteArray)),this,SLOT(showData(QLowEnergyCharacteristic,QByteArray)));
 
     foreach (QLowEnergyService *Service, m_AccServices) {
        connect(Service,SIGNAL(stateChanged(QLowEnergyService::ServiceState)),this,SLOT(ConfigServices()));
@@ -369,6 +468,18 @@ void SensorTag::StopAquasition()
 
     ui->btn_start->setEnabled(true);
     ui->btn_stop->setEnabled(false);
+
+}
+
+void SensorTag::OpenOutFile()
+{
+
+    m_OutputFileName = QFileDialog::getSaveFileName(this,tr("Open Datafile"), "", tr("Datafiles (*.csv)"));
+    ui->le_out_fname->setText(m_OutputFileName);
+}
+
+void SensorTag::CloseOutFile()
+{
 
 }
 

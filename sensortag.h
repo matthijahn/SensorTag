@@ -10,6 +10,9 @@
 #include <QBluetoothUuid>
 #include <QLowEnergyCharacteristic>
 
+#include <QFile>
+#include <QFileDialog>
+
 #include "scanner.h"
 
 #define ACC_UUID    "{f000aa10-0451-4000-b000-000000000000}"
@@ -63,7 +66,19 @@ private:
     QList<QLowEnergyCharacteristic> m_GyroPeriodChars;
     QList<QLowEnergyCharacteristic> m_GyroDataChars;
 
-    QLowEnergyDescriptor m_NotificationDesc;
+    QList<QLowEnergyDescriptor> m_AccNotificationDesc;
+    QList<QLowEnergyDescriptor> m_GyroNotificationDesc;
+
+    //QLowEnergyDescriptor m_NotificationDesc;
+
+    QString m_OutputFileName = "default.csv";
+    QFile *m_OutFile;
+    QTextStream m_OutStream;
+
+    QMap<int, QByteArray> m_AccDataMap;
+    QMap<int, QByteArray> m_GyroDataMap;
+
+    //QMap<QString, QByteArray> m_Values_Map;
 
     struct
     {
@@ -80,7 +95,7 @@ private:
 
     } m_DeviceData;
 
-
+    void ShowData();
 
 
 
@@ -115,11 +130,17 @@ private slots:
     void DiscoverServices();
     void ConnectToService();
     void ConfigDevice(QLowEnergyService::ServiceState BleServiceState);
-    void showData(QLowEnergyCharacteristic Char, QByteArray value);
+    //void writeData(QLowEnergyCharacteristic Char, QByteArray value);
+
+    void aquireData(QLowEnergyCharacteristic Char, QByteArray value);
+
     void UpdateConfig();
     void NoChangedConfig();
 
     void StopAquasition();
+
+    void OpenOutFile();
+    void CloseOutFile();
     //void ReadChar(QLowEnergyService::ServiceState BleServiceState);
 
 };
